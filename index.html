@@ -1,48 +1,100 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bloc de Notas Policial</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Bloc de Notas</h1>
-    <form id="noteForm">
-      <label for="documentNumber">Número de Documento:</label>
-      <input type="text" id="documentNumber" name="documentNumber" required>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-      <label for="fullName">Nombre y apellidos:</label>
-      <input type="text" id="fullName" name="fullName" required>
+.container {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 600px;
+}
 
-      <label for="birthdate">Fecha de nacimiento:</label>
-      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}-\d{2}-\d{4}" placeholder="DD-MM-AAAA" required>
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-      <label for="parentsName">Nombre del padre y la madre:</label>
-      <input type="text" id="parentsName" name="parentsName">
+form {
+  display: flex;
+  flex-direction: column;
+}
 
-      <label for="address">Dirección del domicilio:</label>
-      <input type="text" id="address" name="address" required>
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
 
-      <label for="phone">Número de teléfono:</label>
-      <input type="tel" id="phone" name="phone" required>
+input, textarea {
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background-color: #2e2e2e;
+  color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-      <label for="facts">Exposición de los hechos:</label>
-      <textarea id="facts" name="facts" rows="4" required></textarea>
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
 
-      <div class="button-container">
-        <button type="button" id="dictateButton" class="btn mic-btn">🎤 Dictar</button>
-        <button type="button" id="cameraButton" class="btn camera-btn">📸 Foto</button>
-        <button type="submit" class="btn save-btn">Guardar Nota</button>
-      </div>
-    </form>
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex: 1;
+  margin-right: 10px;
+}
 
-    <button type="button" id="newNoteButton" class="btn add-btn">+ Crear Nueva Nota</button>
+.btn:last-child {
+  margin-right: 0;
+}
 
-    <div id="notesContainer"></div>
-  </div>
+.mic-btn {
+  background-color: #007BFF;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+.mic-btn:hover {
+  background-color: #0056b3;
+}
+
+.camera-btn {
+  background-color: #dc3545;
+}
+
+.camera-btn:hover {
+  background-color: #c82333;
+}
+
+.save-btn {
+  background-color: #ffc107;
+}
+
+.save-btn:hover {
+  background-color: #e0a800;
+}
+
+.add-btn {
+  background-color: #28a745;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 18px
