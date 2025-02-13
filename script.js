@@ -39,8 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
       documentNumber: document.getElementById('documentNumber').value,
       fullName: document.getElementById('fullName').value,
       birthdate: document.getElementById('birthdate').value,
-      address: document.getElementById('address').value,
-      phone: document.getElementById('phone').value,
       facts: document.getElementById('facts').value,
       photoUrl
     };
@@ -52,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function displayNotes() {
-    notesContainer.innerHTML = JSON.parse(localStorage.getItem('notes')) || [];
+    notesContainer.innerHTML = JSON.parse(localStorage.getItem('notes')).map(note => `<p>${note.fullName}</p>`).join('');
   }
 
   displayNotes();
