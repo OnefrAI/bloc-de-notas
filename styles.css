@@ -46,32 +46,25 @@ input, textarea {
   box-sizing: border-box;
 }
 
+/* Contenedor de botones con 3 botones en línea */
 .button-container {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
 }
 
-/* Botón "Crear Nota" (verde) */
-.btn.create-btn {
-  background-color: #28a745;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
-  flex: 1;
-}
-.btn.create-btn:hover {
-  background-color: #218838;
-}
-
-/* Botón "Activar Cámara" (azul, pequeño) */
+/* Botón "Activar Cámara" (azul, con emoji, sin texto adicional) */
 .btn.activate-camera-btn {
   background-color: #007BFF;
   padding: 5px 10px;
-  font-size: 14px;
+  font-size: 24px;
   border-radius: 10px;
-  margin: 0 5px;
+  margin-right: 5px;
   flex: 0 0 auto;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 .btn.activate-camera-btn:hover {
   background-color: #0056b3;
@@ -84,11 +77,33 @@ input, textarea {
   font-size: 16px;
   border-radius: 10px;
   flex: 1;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 .btn.save-btn:hover {
   background-color: #e0a800;
 }
 
+/* Botón "Compartir Nota" (verde) */
+.btn.share-btn {
+  background-color: #28a745;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  margin-left: 5px;
+  flex: 1;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.btn.share-btn:hover {
+  background-color: #218838;
+}
+
+/* Notas guardadas */
 #notesContainer {
   margin-top: 20px;
 }
@@ -116,7 +131,6 @@ input, textarea {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .note button:hover {
   background-color: #c82333;
 }
