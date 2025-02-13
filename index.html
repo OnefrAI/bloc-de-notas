@@ -1,116 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const noteForm = document.getElementById('noteForm');
-  const notesContainer = document.getElementById('notesContainer');
-  const dictateButton = document.getElementById('dictateButton');
-  const cameraButton = document.getElementById('cameraButton');
-  const photoInput = document.getElementById('photo');
-  const addNoteButton = document.getElementById('addNoteButton');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloc de Notas Policial</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bloc de Notas</h1>
+    <form id="noteForm">
+      <label for="documentNumber">Número de Documento:</label>
+      <input type="text" id="documentNumber" name="documentNumber" required>
 
-  noteForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+      <label for="fullName">Nombre y apellidos:</label>
+      <input type="text" id="fullName" name="fullName" required>
 
-    const documentNumber = document.getElementById('documentNumber').value;
-    const fullName = document.getElementById('fullName').value;
-    const birthdate = document.getElementById('birthdate').value;
-    const parentsName = document.getElementById('parentsName').value;
-    const address = document.getElementById('address').value;
-    const phone = document.getElementById('phone').value;
-    const facts = document.getElementById('facts').value;
-    let photoUrl = '';
+      <label for="birthdate">Fecha de nacimiento:</label>
+      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="DD/MM/AAAA" required>
 
-    if (photoInput.files.length > 0) {
-      const file = photoInput.files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        photoUrl = event.target.result;
-        saveNote(documentNumber, fullName, birthdate, parentsName, address, phone, facts, photoUrl);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      saveNote(documentNumber, fullName, birthdate, parentsName, address, phone, facts, photoUrl);
-    }
-  });
+      <label for="parentsName">Nombre del padre y la madre:</label>
+      <input type="text" id="parentsName" name="parentsName">
 
-  dictateButton.addEventListener('click', () => {
-    const facts = document.getElementById('facts');
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+      <label for="address">Dirección del domicilio:</label>
+      <input type="text" id="address" name="address" required>
 
-    recognition.start();
+      <label for="phone">Número de teléfono:</label>
+      <input type="tel" id="phone" name="phone" required>
 
-    recognition.onresult = (event) => {
-      const speechResult = event.results[0][0].transcript;
-      facts.value = speechResult;
-    };
+      <label for="facts">Exposición de los hechos:</label>
+      <textarea id="facts" name="facts" rows="4" required></textarea>
 
-    recognition.onerror = (event) => {
-      console.error('Error al usar el reconocimiento de voz:', event.error);
-    };
+      <div class="button-container">
+        <button type="button" id="dictateButton" class="btn mic-btn">🎤 Dictar</button>
+        <button type="button" id="cameraButton" class="btn camera-btn">📸 Foto</button>
+        <button type="submit" class="btn save-btn">Guardar Nota</button>
+      </div>
+    </form>
 
-    recognition.onend = () => {
-      console.log('Reconocimiento de voz finalizado');
-    };
-  });
+    <button type="button" id="newNoteButton" class="btn add-btn">+ Crear Nueva Nota</button>
 
-  cameraButton.addEventListener('click', () => {
-    photoInput.click();
-  });
+    <div id="notesContainer"></div>
+  </div>
 
-  addNoteButton.addEventListener('click', () => {
-    noteForm.reset();
-  });
-
-  function saveNote(documentNumber, fullName, birthdate, parentsName, address, phone, facts, photoUrl) {
-    const note = {
-      documentNumber,
-      fullName,
-      birthdate,
-      parentsName,
-      address,
-      phone,
-      facts,
-      photoUrl,
-      timestamp: new Date().toISOString()
-    };
-
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.push(note);
-    localStorage.setItem('notes', JSON.stringify(notes));
-
-    displayNotes();
-    noteForm.reset();
-  }
-
-  function displayNotes() {
-    notesContainer.innerHTML = '';
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-
-    notes.forEach((note, index) => {
-      const noteElement = document.createElement('div');
-      noteElement.classList.add('note');
-      noteElement.innerHTML = `
-        <p><strong>Número de Documento:</strong> ${note.documentNumber}</p>
-        <p><strong>Nombre y apellidos:</strong> ${note.fullName}</p>
-        <p><strong>Fecha de nacimiento:</strong> ${note.birthdate}</p>
-        <p><strong>Nombre del padre y la madre:</strong> ${note.parentsName}</p>
-        <p><strong>Dirección del domicilio:</strong> ${note.address}</p>
-        <p><strong>Número de teléfono:</strong> ${note.phone}</p>
-        <p><strong>Exposición de los hechos:</strong> ${note.facts}</p>
-        ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto">` : ''}
-        <button onclick="deleteNote(${index})">Eliminar</button>
-      `;
-      notesContainer.appendChild(noteElement);
-    });
-  }
-
-  window.deleteNote = (index) => {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.splice(index, 1);
-    localStorage.setItem('notes', JSON.stringify(notes));
-    displayNotes();
-  };
-
-  displayNotes();
-});
+  <script src="script.js"></script>
+</body>
+</html>
