@@ -42,6 +42,8 @@ input, textarea, button {
   border: 1px solid #333;
   background-color: #2e2e2e;
   color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button {
@@ -87,12 +89,18 @@ button:hover {
   background-color: #c82333;
 }
 
+#addNoteButton {
+  width: 100%;
+  background-color: #28a745;
+  margin-top: 10px;
+}
+
+#addNoteButton:hover {
+  background-color: #218838;
+}
+
 @media (max-width: 480px) {
   .container {
     padding: 15px;
-  }
-
-  input, textarea, button {
-    width: 100%;
   }
 }
