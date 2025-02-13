@@ -16,12 +16,19 @@ body {
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   width: 90%;
-  max-width: 600px;
+  max-width: 800px;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
 }
 
 form {
@@ -46,19 +53,19 @@ input, textarea {
   box-sizing: border-box;
 }
 
-/* Estilos para la sección de personas */
-.person {
+/* Sección de Identificados */
+.identification {
   border: 1px solid #333;
   padding: 10px;
   border-radius: 10px;
   margin-bottom: 10px;
 }
-.person label {
+.identification label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-.person input {
+.identification input {
   width: 100%;
   margin-bottom: 10px;
   padding: 8px;
@@ -67,7 +74,7 @@ input, textarea {
   background-color: #2e2e2e;
   color: #fff;
 }
-.btn.delete-person-btn {
+.btn.delete-identification-btn {
   background-color: #dc3545;
   padding: 5px 10px;
   font-size: 14px;
@@ -77,7 +84,7 @@ input, textarea {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-.btn.delete-person-btn:hover {
+.btn.delete-identification-btn:hover {
   background-color: #c82333;
 }
 
@@ -87,10 +94,8 @@ input, textarea {
   margin-bottom: 15px;
 }
 
+/* Botones generales */
 .btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
   border: none;
   color: white;
   cursor: pointer;
@@ -100,6 +105,9 @@ input, textarea {
 /* Botón "Nueva Nota" (verde) */
 .new-note-btn {
   background-color: #28a745;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
   flex: 1;
 }
 .new-note-btn:hover {
@@ -111,6 +119,7 @@ input, textarea {
   background-color: #007BFF;
   padding: 5px 10px;
   font-size: 14px;
+  border-radius: 10px;
   margin: 0 5px;
   flex: 0 0 auto;
 }
@@ -121,6 +130,9 @@ input, textarea {
 /* Botón "Guardar Nota" (amarillo) */
 .save-btn {
   background-color: #ffc107;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
   flex: 1;
 }
 .save-btn:hover {
