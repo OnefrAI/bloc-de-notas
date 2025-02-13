@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   const noteForm = document.getElementById('noteForm');
   const notesContainer = document.getElementById('notesContainer');
-  const createNoteButton = document.getElementById('createNoteButton');
   const activateCameraButton = document.getElementById('activateCameraButton');
+  const saveNoteButton = document.getElementById('saveNoteButton');
+  const shareNoteButton = document.getElementById('shareNoteButton');
   const videoContainer = document.getElementById('videoContainer');
   const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
@@ -10,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let cameraStream = null;
   let tempPhotoData = '';
+  let lastSavedNote = null;
+  // Inicialmente, el botón de compartir está deshabilitado
+  shareNoteButton.disabled = true;
 
   // Función para iniciar la cámara y mostrar el video en vivo
   function startCamera() {
@@ -19,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         video.srcObject = stream;
         video.play();
         videoContainer.style.display = 'block';
-        activateCameraButton.textContent = "Capturar Foto";
+        // El botón muestra un emoji de cámara
+        activateCameraButton.textContent = "📷";
       })
       .catch(err => {
         console.error("Error al acceder a la cámara:", err);
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Función para capturar una foto del video
+  // Función para capturar una foto del video y procesarla con OCR
   function capturePhoto() {
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
@@ -37,6 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
     tempPhotoData = canvas.toDataURL('image/png');
     photoPreview.src = tempPhotoData;
     photoPreviewContainer.style.display = 'block';
+
+    // Llamar a Tesseract.js para realizar OCR y autocompletar campos
+    Tesseract.recognize(tempPhotoData, 'spa', { logger: m => console.log(m) })
+      .then(({ data: { text } }) => {
+        console.log("Resultado OCR:", text);
+        autoCompletarCampos(text);
+      })
+      .catch(err => {
+        console.error("Error en OCR:", err);
+      });
   }
 
   // Función para detener la cámara
@@ -46,11 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
       cameraStream = null;
     }
     videoContainer.style.display = 'none';
-    activateCameraButton.textContent = "Activar Cámara";
+    activateCameraButton.textContent = "📷";
   }
 
-  // Evento para el botón "Activar Cámara"
-  // Si la cámara no está activa, se inicia; si ya está activa, se captura la imagen y se detiene la cámara.
+  // Evento para el botón de cámara:
+  // Si la cámara no está activa, se inicia; si ya está activa, se captura la imagen y se detiene.
   activateCameraButton.addEventListener('click', () => {
     if (!cameraStream) {
       startCamera();
@@ -60,13 +75,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Evento para guardar la nota (se puede guardar sin que todos los campos estén rellenos)
+  // Función para autocompletar campos usando el texto extraído con OCR
+  function autoCompletarCampos(ocrText) {
+    // Ejemplo: extraer un número de documento (mínimo 8 dígitos)
+    const docMatch = ocrText.match(/\d{8,}/);
+    if (docMatch) {
+      document.getElementById('documentNumber').value = docMatch[0];
+    }
+    // Ejemplo: extraer un nombre en mayúsculas
+    const nameMatch = ocrText.match(/([A-Z]{2,}\s+[A-Z]{2,}(?:\s+[A-Z]{2,})?)/);
+    if (nameMatch) {
+      document.getElementById('fullName').value = nameMatch[0];
+    }
+    // Se pueden agregar más expresiones para otros campos según el formato de los documentos
+  }
+
+  // Evento para guardar la nota
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     saveNote();
   });
 
-  // Función para guardar la nota en localStorage
+  // Función para guardar la nota y habilitar el botón de compartir
   function saveNote() {
     const noteData = {
       documentNumber: document.getElementById('documentNumber').value,
@@ -84,12 +114,47 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 
-    // Reiniciar el formulario y limpiar la foto capturada
+    // Reiniciar el formulario y limpiar la imagen capturada
     noteForm.reset();
     tempPhotoData = '';
     photoPreviewContainer.style.display = 'none';
-    activateCameraButton.textContent = "Activar Cámara";
+    activateCameraButton.textContent = "📷";
     alert("Nota guardada exitosamente.");
+
+    // Guardar la nota recientemente guardada y habilitar el botón de compartir
+    lastSavedNote = noteData;
+    shareNoteButton.disabled = false;
+  }
+
+  // Evento para compartir la nota usando la Web Share API
+  shareNoteButton.addEventListener('click', () => {
+    if (lastSavedNote) {
+      shareNote(lastSavedNote);
+    }
+  });
+
+  // Función para compartir la nota
+  function shareNote(noteData) {
+    const shareText = `Nota Policial:
+Documento: ${noteData.documentNumber || 'N/A'}
+Nombre: ${noteData.fullName || 'N/A'}
+Fecha de Nacimiento: ${noteData.birthdate || 'N/A'}
+Padres: ${noteData.parentsName || 'N/A'}
+Domicilio: ${noteData.address || 'N/A'}
+Teléfono: ${noteData.phone || 'N/A'}
+Hechos: ${noteData.facts || 'N/A'}`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Nota Policial',
+        text: shareText
+      }).then(() => {
+        console.log('Nota compartida exitosamente.');
+      }).catch(err => {
+        console.error('Error al compartir:', err);
+      });
+    } else {
+      alert("Tu navegador no soporta la función de compartir.");
+    }
   }
 
   // Función para mostrar las notas guardadas
@@ -124,6 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Mostrar notas al cargar la página
+  // Mostrar las notas guardadas al cargar la página
   displayNotes();
 });
