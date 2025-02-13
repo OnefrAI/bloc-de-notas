@@ -1,95 +1,79 @@
 document.addEventListener('DOMContentLoaded', () => {
   const noteForm = document.getElementById('noteForm');
   const notesContainer = document.getElementById('notesContainer');
-  const dictateButton = document.getElementById('dictateButton');
-  const cameraButton = document.getElementById('cameraButton');
-  const newNoteButton = document.getElementById('newNoteButton');
+  const createNoteButton = document.getElementById('createNoteButton');
+  const videoContainer = document.getElementById('videoContainer');
+  const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
   const photoPreview = document.getElementById('photoPreview');
 
+  let cameraStream = null;
   let tempPhotoData = '';
 
-  // Función para actualizar la vista previa de la foto
-  function updatePhotoPreview(data) {
-    if (data) {
-      photoPreview.src = data;
-      photoPreviewContainer.style.display = 'block';
-    } else {
-      photoPreview.src = '';
-      photoPreviewContainer.style.display = 'none';
-    }
+  // Función para iniciar la cámara y mostrar el video en vivo
+  function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => {
+        cameraStream = stream;
+        video.srcObject = stream;
+        video.play();
+        videoContainer.style.display = 'block';
+        createNoteButton.textContent = "Capturar Foto";
+      })
+      .catch(err => {
+        console.error("Error al acceder a la cámara:", err);
+        alert("No se pudo acceder a la cámara. Asegúrate de haber otorgado permisos.");
+      });
   }
 
-  // Evento para el botón "Dictar"
-  dictateButton.addEventListener('click', () => {
-    const facts = document.getElementById('facts');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("API de reconocimiento de voz no soportada en este navegador.");
-      return;
+  // Función para capturar una foto del video
+  function capturePhoto() {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    tempPhotoData = canvas.toDataURL('image/png');
+    photoPreview.src = tempPhotoData;
+    photoPreviewContainer.style.display = 'block';
+  }
+
+  // Función para detener la cámara
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'es-ES';
+    videoContainer.style.display = 'none';
+    createNoteButton.textContent = "Crear Nota";
+  }
 
-    dictateButton.textContent = "Grabando...";
-    try {
-      recognition.start();
-    } catch (err) {
-      console.error("Error al iniciar el reconocimiento:", err);
-      alert("No se pudo iniciar el reconocimiento de voz.");
-      dictateButton.textContent = "🎤 Dictar";
-      return;
-    }
-
-    recognition.onresult = (event) => {
-      facts.value = event.results[0][0].transcript;
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Error en el reconocimiento:", event.error);
-      let errorMsg = "Ocurrió un error durante el reconocimiento de voz.";
-      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-        errorMsg += " Permiso denegado. Asegúrate de permitir el acceso al micrófono.";
-      } else if (event.error === "network") {
-        errorMsg += " Problema de red.";
-      } else if (event.error === "no-speech") {
-        errorMsg += " No se detectó ningún habla. Intenta hablar más claro.";
+  // Evento para el botón "Crear Nota"
+  // Si la cámara no está activa, se inicia para tomar foto; si está activa, se captura la imagen.
+  createNoteButton.addEventListener('click', () => {
+    if (!cameraStream) {
+      // Si ya hay una foto capturada, preguntar si se desea retomar otra.
+      if (tempPhotoData) {
+        if (!confirm("Ya se ha capturado una foto. ¿Deseas tomar otra?")) {
+          return;
+        }
+        tempPhotoData = '';
+        photoPreviewContainer.style.display = 'none';
       }
-      alert(errorMsg);
-    };
-
-    recognition.onend = () => {
-      dictateButton.textContent = "🎤 Dictar";
-    };
+      startCamera();
+    } else {
+      capturePhoto();
+      stopCamera();
+    }
   });
 
-  // Evento para el botón "Foto"
-  cameraButton.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.click();
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          tempPhotoData = e.target.result;
-          updatePhotoPreview(tempPhotoData);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-  });
-
-  // Evento para guardar la nota al enviar el formulario
+  // Evento para guardar la nota (se puede guardar sin que todos los campos estén rellenos)
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     saveNote();
   });
 
-  // Función para guardar la nota
+  // Función para guardar la nota en localStorage
   function saveNote() {
     const noteData = {
       documentNumber: document.getElementById('documentNumber').value,
@@ -107,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 
-    // Reiniciar el formulario y la foto temporal
+    // Reiniciar el formulario y limpiar la foto capturada
     noteForm.reset();
     tempPhotoData = '';
-    updatePhotoPreview('');
+    photoPreviewContainer.style.display = 'none';
     alert("Nota guardada exitosamente.");
   }
 
@@ -123,13 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     notesContainer.innerHTML = notes.map((note, index) => `
       <div class="note">
-        <p><strong>Documento:</strong> ${note.documentNumber}</p>
-        <p><strong>Nombre:</strong> ${note.fullName}</p>
-        <p><strong>Fecha de nacimiento:</strong> ${note.birthdate}</p>
-        <p><strong>Padres:</strong> ${note.parentsName}</p>
-        <p><strong>Dirección:</strong> ${note.address}</p>
-        <p><strong>Teléfono:</strong> ${note.phone}</p>
-        <p><strong>Hechos:</strong> ${note.facts}</p>
+        <p><strong>Documento:</strong> ${note.documentNumber || 'N/A'}</p>
+        <p><strong>Nombre:</strong> ${note.fullName || 'N/A'}</p>
+        <p><strong>Fecha de nacimiento:</strong> ${note.birthdate || 'N/A'}</p>
+        <p><strong>Padres:</strong> ${note.parentsName || 'N/A'}</p>
+        <p><strong>Dirección:</strong> ${note.address || 'N/A'}</p>
+        <p><strong>Teléfono:</strong> ${note.phone || 'N/A'}</p>
+        <p><strong>Hechos:</strong> ${note.facts || 'N/A'}</p>
         ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto de la nota">` : ''}
         <button onclick="deleteNote(${index})">Eliminar</button>
       </div>
@@ -147,13 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
-
-  // Evento para el botón "Crear Nueva Nota"
-  newNoteButton.addEventListener('click', () => {
-    noteForm.reset();
-    tempPhotoData = '';
-    updatePhotoPreview('');
-  });
 
   // Mostrar notas al cargar la página
   displayNotes();
