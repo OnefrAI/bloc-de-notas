@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dictateButton = document.getElementById('dictateButton');
   const cameraButton = document.getElementById('cameraButton');
   const photoInput = document.getElementById('photo');
+  const addNoteButton = document.getElementById('addNoteButton');
 
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -55,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cameraButton.addEventListener('click', () => {
     photoInput.click();
+  });
+
+  addNoteButton.addEventListener('click', () => {
+    noteForm.reset();
   });
 
   function saveNote(documentNumber, fullName, birthdate, parentsName, address, phone, facts, photoUrl) {
