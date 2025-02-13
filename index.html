@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bloc de Notas Policial</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Incluir Tesseract.js para OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v2.1.5/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -17,7 +19,7 @@
       <input type="text" id="fullName" name="fullName">
 
       <label for="birthdate">Fecha de nacimiento:</label>
-      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}-\d{2}-\d{4}" placeholder="DD-MM-AAAA">
+      <input type="text" id="birthdate" name="birthdate" placeholder="DD-MM-AAAA">
 
       <label for="parentsName">Nombre del padre y la madre:</label>
       <input type="text" id="parentsName" name="parentsName">
@@ -32,17 +34,20 @@
       <textarea id="facts" name="facts" rows="4"></textarea>
 
       <div class="button-container">
-         <button type="button" id="createNoteButton" class="btn create-btn">Crear Nota</button>
-         <button type="button" id="activateCameraButton" class="btn activate-camera-btn">Activar Cámara</button>
+         <!-- Botón azul para activar la cámara (izquierda) -->
+         <button type="button" id="activateCameraButton" class="btn activate-camera-btn">📷</button>
+         <!-- Botón amarillo para guardar la nota (centro) -->
          <button type="submit" id="saveNoteButton" class="btn save-btn">Guardar Nota</button>
+         <!-- Botón verde para compartir la nota (derecha) -->
+         <button type="button" id="shareNoteButton" class="btn share-btn" disabled>📤 Compartir Nota</button>
       </div>
       
-      <!-- Contenedor para el video de la cámara (inicialmente oculto) -->
+      <!-- Contenedor para el video de la cámara (oculto inicialmente) -->
       <div id="videoContainer" style="display: none;">
         <video id="video" autoplay></video>
       </div>
       
-      <!-- Vista previa de la foto capturada (inicialmente oculta) -->
+      <!-- Vista previa de la foto capturada (oculta inicialmente) -->
       <div id="photoPreviewContainer" style="display: none;">
         <img id="photoPreview" src="" alt="Foto capturada">
       </div>
