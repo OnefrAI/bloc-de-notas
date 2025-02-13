@@ -8,28 +8,44 @@
 </head>
 <body>
   <div class="container">
-    <h1>Bloc de Notas</h1>
+    <h1>Bloc de Notas Policial</h1>
     <form id="noteForm">
-      <!-- Campo común para la intervención -->
-      <label for="facts">Exposición de los hechos:</label>
+      <h2>Datos Principales</h2>
+      <label for="documentNumber">Número de Documento:</label>
+      <input type="text" id="documentNumber" name="documentNumber">
+
+      <label for="fullName">Nombre y Apellidos:</label>
+      <input type="text" id="fullName" name="fullName">
+
+      <label for="birthdate">Fecha de Nacimiento:</label>
+      <input type="text" id="birthdate" name="birthdate" placeholder="DD-MM-AAAA">
+
+      <label for="parentsName">Nombre del padre y la madre:</label>
+      <input type="text" id="parentsName" name="parentsName">
+
+      <label for="address">Dirección del Domicilio:</label>
+      <input type="text" id="address" name="address">
+
+      <label for="phone">Número de Teléfono:</label>
+      <input type="tel" id="phone" name="phone">
+
+      <label for="facts">Exposición de los Hechos:</label>
       <textarea id="facts" name="facts" rows="4"></textarea>
-      
-      <!-- Sección para identificar personas -->
-      <h2>Identificaciones</h2>
-      <div id="personsContainer">
-        <div class="person">
+
+      <h2>Identificados</h2>
+      <div id="identificationsContainer">
+        <div class="identification">
           <label>Número de Documento:</label>
-          <input type="text" name="personDocument">
+          <input type="text" name="idDocument">
           <label>Nombre y Apellidos:</label>
-          <input type="text" name="personName">
+          <input type="text" name="idName">
           <label>Fecha de Nacimiento:</label>
-          <input type="text" name="personBirthdate" placeholder="DD-MM-AAAA">
-          <button type="button" class="btn delete-person-btn" style="display: none;">Eliminar</button>
+          <input type="text" name="idBirthdate" placeholder="DD-MM-AAAA">
+          <button type="button" class="btn delete-identification-btn" style="display: none;">Eliminar</button>
         </div>
       </div>
-      <button type="button" id="addPersonButton" class="btn add-person-btn">Agregar Persona</button>
+      <button type="button" id="addIdentificationButton" class="btn add-identification-btn">Agregar Identificado</button>
       
-      <!-- Botones de acción -->
       <div class="button-container">
          <button type="button" id="newNoteButton" class="btn new-note-btn">Nueva Nota</button>
          <button type="button" id="activateCameraButton" class="btn activate-camera-btn">Activar Cámara</button>
