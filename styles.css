@@ -52,35 +52,40 @@ input, textarea {
   margin-bottom: 15px;
 }
 
-.btn {
+/* Botón "Crear Nota" (verde) */
+.btn.create-btn {
+  background-color: #28a745;
   padding: 10px 20px;
   font-size: 16px;
   border-radius: 10px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
   flex: 1;
-  margin-right: 10px;
 }
-
-.btn:last-child {
-  margin-right: 0;
-}
-
-.create-btn {
-  background-color: #28a745; /* Verde */
-}
-
-.create-btn:hover {
+.btn.create-btn:hover {
   background-color: #218838;
 }
 
-.save-btn {
-  background-color: #ffc107; /* Amarillo */
+/* Botón "Activar Cámara" (azul, pequeño) */
+.btn.activate-camera-btn {
+  background-color: #007BFF;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  margin: 0 5px;
+  flex: 0 0 auto;
+}
+.btn.activate-camera-btn:hover {
+  background-color: #0056b3;
 }
 
-.save-btn:hover {
+/* Botón "Guardar Nota" (amarillo) */
+.btn.save-btn {
+  background-color: #ffc107;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  flex: 1;
+}
+.btn.save-btn:hover {
   background-color: #e0a800;
 }
 
