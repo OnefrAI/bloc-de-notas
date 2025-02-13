@@ -68,41 +68,20 @@ input, textarea {
   margin-right: 0;
 }
 
-.mic-btn {
-  background-color: #007BFF;
+.create-btn {
+  background-color: #28a745; /* Verde */
 }
 
-.mic-btn:hover {
-  background-color: #0056b3;
-}
-
-.camera-btn {
-  background-color: #dc3545;
-}
-
-.camera-btn:hover {
-  background-color: #c82333;
+.create-btn:hover {
+  background-color: #218838;
 }
 
 .save-btn {
-  background-color: #ffc107;
+  background-color: #ffc107; /* Amarillo */
 }
 
 .save-btn:hover {
   background-color: #e0a800;
-}
-
-.add-btn {
-  background-color: #28a745;
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  font-size: 18px;
-  text-align: center;
-}
-
-.add-btn:hover {
-  background-color: #218838;
 }
 
 #notesContainer {
@@ -135,6 +114,13 @@ input, textarea {
 
 .note button:hover {
   background-color: #c82333;
+}
+
+/* Estilos para el video de la cámara */
+#video {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
 /* Estilos para la vista previa de la foto */
