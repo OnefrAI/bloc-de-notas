@@ -8,47 +8,31 @@
 </head>
 <body>
   <div class="container">
-    <h1>Bloc de Notas Policial</h1>
+    <h1>Bloc de Notas</h1>
     <form id="noteForm">
-      <h2>Datos Principales</h2>
       <label for="documentNumber">Número de Documento:</label>
       <input type="text" id="documentNumber" name="documentNumber">
 
-      <label for="fullName">Nombre y Apellidos:</label>
+      <label for="fullName">Nombre y apellidos:</label>
       <input type="text" id="fullName" name="fullName">
 
-      <label for="birthdate">Fecha de Nacimiento:</label>
-      <input type="text" id="birthdate" name="birthdate" placeholder="DD-MM-AAAA">
+      <label for="birthdate">Fecha de nacimiento:</label>
+      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}-\d{2}-\d{4}" placeholder="DD-MM-AAAA">
 
       <label for="parentsName">Nombre del padre y la madre:</label>
       <input type="text" id="parentsName" name="parentsName">
 
-      <label for="address">Dirección del Domicilio:</label>
+      <label for="address">Dirección del domicilio:</label>
       <input type="text" id="address" name="address">
 
-      <label for="phone">Número de Teléfono:</label>
+      <label for="phone">Número de teléfono:</label>
       <input type="tel" id="phone" name="phone">
 
-      <label for="facts">Exposición de los Hechos:</label>
+      <label for="facts">Exposición de los hechos:</label>
       <textarea id="facts" name="facts" rows="4"></textarea>
 
-      <h2>Identificados</h2>
-      <div id="identificationsContainer">
-        <div class="identification">
-          <label>Número de Documento:</label>
-          <input type="text" name="idDocument">
-          <label>Nombre y Apellidos:</label>
-          <input type="text" name="idName">
-          <label>Fecha de Nacimiento:</label>
-          <input type="text" name="idBirthdate" placeholder="DD-MM-AAAA">
-          <button type="button" class="btn delete-identification-btn" style="display: none;">Eliminar</button>
-        </div>
-      </div>
-      <button type="button" id="addIdentificationButton" class="btn add-identification-btn">Agregar Identificado</button>
-      
       <div class="button-container">
-         <button type="button" id="newNoteButton" class="btn new-note-btn">Nueva Nota</button>
-         <button type="button" id="activateCameraButton" class="btn activate-camera-btn">Activar Cámara</button>
+         <button type="button" id="createNoteButton" class="btn create-btn">Crear Nota</button>
          <button type="submit" id="saveNoteButton" class="btn save-btn">Guardar Nota</button>
       </div>
       
