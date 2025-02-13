@@ -136,3 +136,10 @@ input, textarea {
 .note button:hover {
   background-color: #c82333;
 }
+
+/* Estilos para la vista previa de la foto */
+#photoPreview {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 15px;
+}
