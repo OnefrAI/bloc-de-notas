@@ -2,20 +2,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const noteForm = document.getElementById('noteForm');
   const notesContainer = document.getElementById('notesContainer');
   const activateCameraButton = document.getElementById('activateCameraButton');
-  const saveNoteButton = document.getElementById('saveNoteButton');
+  let saveNoteButton = document.getElementById('saveNoteButton');
   const shareNoteButton = document.getElementById('shareNoteButton');
   const videoContainer = document.getElementById('videoContainer');
   const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
   const photoPreview = document.getElementById('photoPreview');
+  const retakePhotoButton = document.getElementById('retakePhotoButton');
+  const photoActions = document.getElementById('photoActions');
 
   let cameraStream = null;
   let tempPhotoData = '';
   let lastSavedNote = null;
-  // Inicialmente, el botón de compartir está deshabilitado
   shareNoteButton.disabled = true;
 
-  // Función para iniciar la cámara y mostrar el video en vivo
+  // Iniciar la cámara
   function startCamera() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => {
@@ -23,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         video.srcObject = stream;
         video.play();
         videoContainer.style.display = 'block';
-        // El botón muestra un emoji de cámara
         activateCameraButton.textContent = "📷";
       })
       .catch(err => {
@@ -32,18 +32,22 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Función para capturar una foto del video y procesarla con OCR
+  // Capturar foto con preprocesamiento para mejorar OCR
   function capturePhoto() {
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const context = canvas.getContext('2d');
+    // Aplicar filtro de escala de grises y aumentar contraste para mejorar OCR
+    context.filter = 'grayscale(100%) contrast(150%)';
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     tempPhotoData = canvas.toDataURL('image/png');
     photoPreview.src = tempPhotoData;
     photoPreviewContainer.style.display = 'block';
+    // Mostrar el botón de rehacer foto
+    photoActions.style.display = 'block';
 
-    // Llamar a Tesseract.js para realizar OCR y autocompletar campos
+    // Procesar imagen con OCR (Tesseract.js)
     Tesseract.recognize(tempPhotoData, 'spa', { logger: m => console.log(m) })
       .then(({ data: { text } }) => {
         console.log("Resultado OCR:", text);
@@ -54,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Función para detener la cámara
+  // Detener la cámara
   function stopCamera() {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
@@ -64,8 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activateCameraButton.textContent = "📷";
   }
 
-  // Evento para el botón de cámara:
-  // Si la cámara no está activa, se inicia; si ya está activa, se captura la imagen y se detiene.
+  // Evento para el botón de cámara: si la cámara no está activa, se inicia; si ya está activa, se captura la imagen y se detiene.
   activateCameraButton.addEventListener('click', () => {
     if (!cameraStream) {
       startCamera();
@@ -75,28 +78,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Función para autocompletar campos usando el texto extraído con OCR
+  // Evento para rehacer la foto
+  retakePhotoButton.addEventListener('click', () => {
+    // Borrar la foto actual y ocultar la vista previa y acciones
+    tempPhotoData = '';
+    photoPreviewContainer.style.display = 'none';
+    photoActions.style.display = 'none';
+    // Reactivar la cámara para capturar otra foto
+    startCamera();
+  });
+
+  // Función para autocompletar campos usando el OCR (se pueden ajustar las expresiones según sea necesario)
   function autoCompletarCampos(ocrText) {
-    // Ejemplo: extraer un número de documento (mínimo 8 dígitos)
     const docMatch = ocrText.match(/\d{8,}/);
     if (docMatch) {
       document.getElementById('documentNumber').value = docMatch[0];
     }
-    // Ejemplo: extraer un nombre en mayúsculas
     const nameMatch = ocrText.match(/([A-Z]{2,}\s+[A-Z]{2,}(?:\s+[A-Z]{2,})?)/);
     if (nameMatch) {
       document.getElementById('fullName').value = nameMatch[0];
     }
-    // Se pueden agregar más expresiones para otros campos según el formato de los documentos
+    // Agrega más lógica de extracción según el formato del documento
   }
 
-  // Evento para guardar la nota
+  // Guardar la nota
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     saveNote();
   });
 
-  // Función para guardar la nota y habilitar el botón de compartir
   function saveNote() {
     const noteData = {
       documentNumber: document.getElementById('documentNumber').value,
@@ -114,26 +124,25 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 
-    // Reiniciar el formulario y limpiar la imagen capturada
+    // Reiniciar formulario y limpiar imagen
     noteForm.reset();
     tempPhotoData = '';
     photoPreviewContainer.style.display = 'none';
+    photoActions.style.display = 'none';
     activateCameraButton.textContent = "📷";
     alert("Nota guardada exitosamente.");
 
-    // Guardar la nota recientemente guardada y habilitar el botón de compartir
     lastSavedNote = noteData;
     shareNoteButton.disabled = false;
   }
 
-  // Evento para compartir la nota usando la Web Share API
+  // Compartir nota usando la Web Share API
   shareNoteButton.addEventListener('click', () => {
     if (lastSavedNote) {
       shareNote(lastSavedNote);
     }
   });
 
-  // Función para compartir la nota
   function shareNote(noteData) {
     const shareText = `Nota Policial:
 Documento: ${noteData.documentNumber || 'N/A'}
@@ -157,7 +166,6 @@ Hechos: ${noteData.facts || 'N/A'}`;
     }
   }
 
-  // Función para mostrar las notas guardadas
   function displayNotes() {
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
     if (notes.length === 0) {
@@ -179,7 +187,6 @@ Hechos: ${noteData.facts || 'N/A'}`;
     `).join('');
   }
 
-  // Función global para eliminar una nota
   window.deleteNote = function(index) {
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
     if (index >= 0 && index < notes.length && confirm("¿Estás seguro de eliminar esta nota?")) {
@@ -189,6 +196,5 @@ Hechos: ${noteData.facts || 'N/A'}`;
     }
   };
 
-  // Mostrar las notas guardadas al cargar la página
   displayNotes();
 });
