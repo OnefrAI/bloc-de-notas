@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const noteForm = document.getElementById('noteForm');
   const notesContainer = document.getElementById('notesContainer');
   const createNoteButton = document.getElementById('createNoteButton');
+  const activateCameraButton = document.getElementById('activateCameraButton');
   const videoContainer = document.getElementById('videoContainer');
   const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         video.srcObject = stream;
         video.play();
         videoContainer.style.display = 'block';
-        createNoteButton.textContent = "Capturar Foto";
+        activateCameraButton.textContent = "Capturar Foto";
       })
       .catch(err => {
         console.error("Error al acceder a la cámara:", err);
@@ -45,21 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
       cameraStream = null;
     }
     videoContainer.style.display = 'none';
-    createNoteButton.textContent = "Crear Nota";
+    activateCameraButton.textContent = "Activar Cámara";
   }
 
-  // Evento para el botón "Crear Nota"
-  // Si la cámara no está activa, se inicia para tomar foto; si está activa, se captura la imagen.
-  createNoteButton.addEventListener('click', () => {
+  // Evento para el botón "Activar Cámara"
+  // Si la cámara no está activa, se inicia; si ya está activa, se captura la imagen y se detiene la cámara.
+  activateCameraButton.addEventListener('click', () => {
     if (!cameraStream) {
-      // Si ya hay una foto capturada, preguntar si se desea retomar otra.
-      if (tempPhotoData) {
-        if (!confirm("Ya se ha capturado una foto. ¿Deseas tomar otra?")) {
-          return;
-        }
-        tempPhotoData = '';
-        photoPreviewContainer.style.display = 'none';
-      }
       startCamera();
     } else {
       capturePhoto();
@@ -95,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noteForm.reset();
     tempPhotoData = '';
     photoPreviewContainer.style.display = 'none';
+    activateCameraButton.textContent = "Activar Cámara";
     alert("Nota guardada exitosamente.");
   }
 
@@ -122,13 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función global para eliminar una nota
   window.deleteNote = function(index) {
-    let notes = JSON.parse(localStorage.getItem('notes')) || [];
-    if (index >= 0 && index < notes.length) {
-      if (confirm("¿Estás seguro de eliminar esta nota?")) {
-        notes.splice(index, 1);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        displayNotes();
-      }
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    if (index >= 0 && index < notes.length && confirm("¿Estás seguro de eliminar esta nota?")) {
+      notes.splice(index, 1);
+      localStorage.setItem('notes', JSON.stringify(notes));
+      displayNotes();
     }
   };
 
