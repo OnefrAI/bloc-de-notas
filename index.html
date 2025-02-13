@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloc de Notas Policial</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bloc de Notas Policial</h1>
+    <form id="noteForm">
+      <label for="documentNumber">Número de Documento:</label>
+      <input type="text" id="documentNumber" name="documentNumber" required>
+
+      <label for="fullName">Nombre y apellidos:</label>
+      <input type="text" id="fullName" name="fullName" required>
+
+      <label for="birthdate">Fecha de nacimiento:</label>
+      <input type="date" id="birthdate" name="birthdate" required>
+
+      <label for="parentsName">Nombre del padre y la madre:</label>
+      <input type="text" id="parentsName" name="parentsName">
+
+      <label for="address">Dirección del domicilio:</label>
+      <input type="text" id="address" name="address" required>
+
+      <label for="phone">Número de teléfono:</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="facts">Exposición de los hechos:</label>
+      <textarea id="facts" name="facts" rows="4" required></textarea>
+      <button type="button" id="dictateButton">Dictar</button>
+
+      <label for="photo">Foto:</label>
+      <input type="file" id="photo" name="photo" accept="image/*" capture="environment" style="display:none;">
+      <button type="button" id="cameraButton">Tomar Foto</button>
+
+      <button type="submit">Guardar Nota</button>
+    </form>
+
+    <div id="notesContainer"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
