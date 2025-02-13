@@ -16,19 +16,12 @@ body {
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   width: 90%;
-  max-width: 800px;
+  max-width: 600px;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 20px;
-}
-
-h2 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #333;
-  padding-bottom: 5px;
 }
 
 form {
@@ -53,88 +46,40 @@ input, textarea {
   box-sizing: border-box;
 }
 
-/* Sección de Identificados */
-.identification {
-  border: 1px solid #333;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-.identification label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-.identification input {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #333;
-  background-color: #2e2e2e;
-  color: #fff;
-}
-.btn.delete-identification-btn {
-  background-color: #dc3545;
-  padding: 5px 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.btn.delete-identification-btn:hover {
-  background-color: #c82333;
-}
-
 .button-container {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
 }
 
-/* Botones generales */
 .btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
   border: none;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
+  flex: 1;
+  margin-right: 10px;
 }
 
-/* Botón "Nueva Nota" (verde) */
-.new-note-btn {
-  background-color: #28a745;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
-  flex: 1;
+.btn:last-child {
+  margin-right: 0;
 }
-.new-note-btn:hover {
+
+.create-btn {
+  background-color: #28a745; /* Verde */
+}
+
+.create-btn:hover {
   background-color: #218838;
 }
 
-/* Botón "Activar Cámara" (azul, más pequeño) */
-.activate-camera-btn {
-  background-color: #007BFF;
-  padding: 5px 10px;
-  font-size: 14px;
-  border-radius: 10px;
-  margin: 0 5px;
-  flex: 0 0 auto;
-}
-.activate-camera-btn:hover {
-  background-color: #0056b3;
+.save-btn {
+  background-color: #ffc107; /* Amarillo */
 }
 
-/* Botón "Guardar Nota" (amarillo) */
-.save-btn {
-  background-color: #ffc107;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
-  flex: 1;
-}
 .save-btn:hover {
   background-color: #e0a800;
 }
@@ -150,11 +95,13 @@ input, textarea {
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
 .note img {
   max-width: 100%;
   border-radius: 10px;
   margin-top: 10px;
 }
+
 .note button {
   background-color: #dc3545;
   color: white;
@@ -164,6 +111,7 @@ input, textarea {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 .note button:hover {
   background-color: #c82333;
 }
