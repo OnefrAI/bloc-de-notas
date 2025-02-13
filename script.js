@@ -32,7 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     recognition.lang = 'es-ES';
 
     dictateButton.textContent = "Grabando...";
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (err) {
+      console.error("Error al iniciar el reconocimiento:", err);
+      alert("No se pudo iniciar el reconocimiento de voz.");
+      dictateButton.textContent = "🎤 Dictar";
+      return;
+    }
 
     recognition.onresult = (event) => {
       facts.value = event.results[0][0].transcript;
@@ -40,7 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     recognition.onerror = (event) => {
       console.error("Error en el reconocimiento:", event.error);
-      alert("Ocurrió un error durante el reconocimiento de voz.");
+      let errorMsg = "Ocurrió un error durante el reconocimiento de voz.";
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        errorMsg += " Permiso denegado. Asegúrate de permitir el acceso al micrófono.";
+      } else if (event.error === "network") {
+        errorMsg += " Problema de red.";
+      } else if (event.error === "no-speech") {
+        errorMsg += " No se detectó ningún habla. Intenta hablar más claro.";
+      }
+      alert(errorMsg);
     };
 
     recognition.onend = () => {
