@@ -1,11 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Elementos del formulario y contenedores
   const noteForm = document.getElementById('noteForm');
   const notesContainer = document.getElementById('notesContainer');
-  const createNoteButton = document.getElementById('createNoteButton');
+  const newNoteButton = document.getElementById('newNoteButton');
+  const activateCameraButton = document.getElementById('activateCameraButton');
+  const saveNoteButton = document.getElementById('saveNoteButton');
+  const addPersonButton = document.getElementById('addPersonButton');
+  const personsContainer = document.getElementById('personsContainer');
   const videoContainer = document.getElementById('videoContainer');
   const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
   const photoPreview = document.getElementById('photoPreview');
+  const facts = document.getElementById('facts');
 
   let cameraStream = null;
   let tempPhotoData = '';
@@ -18,11 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         video.srcObject = stream;
         video.play();
         videoContainer.style.display = 'block';
-        createNoteButton.textContent = "Capturar Foto";
+        activateCameraButton.textContent = "Capturar Foto";
       })
       .catch(err => {
         console.error("Error al acceder a la cámara:", err);
-        alert("No se pudo acceder a la cámara. Asegúrate de haber otorgado permisos.");
+        alert("No se pudo acceder a la cámara. Asegúrate de otorgar permisos.");
       });
   }
 
@@ -45,21 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
       cameraStream = null;
     }
     videoContainer.style.display = 'none';
-    createNoteButton.textContent = "Crear Nota";
+    activateCameraButton.textContent = "Activar Cámara";
   }
 
-  // Evento para el botón "Crear Nota"
-  // Si la cámara no está activa, se inicia para tomar foto; si está activa, se captura la imagen.
-  createNoteButton.addEventListener('click', () => {
+  // Evento para el botón "Activar Cámara"
+  activateCameraButton.addEventListener('click', () => {
     if (!cameraStream) {
-      // Si ya hay una foto capturada, preguntar si se desea retomar otra.
-      if (tempPhotoData) {
-        if (!confirm("Ya se ha capturado una foto. ¿Deseas tomar otra?")) {
-          return;
-        }
-        tempPhotoData = '';
-        photoPreviewContainer.style.display = 'none';
-      }
       startCamera();
     } else {
       capturePhoto();
@@ -67,7 +64,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Evento para guardar la nota (se puede guardar sin que todos los campos estén rellenos)
+  // Evento para el botón "Nueva Nota": resetea el formulario y vuelve a dejar en estado inicial
+  newNoteButton.addEventListener('click', () => {
+    noteForm.reset();
+    // Reiniciar contenedor de personas dejando una entrada inicial
+    personsContainer.innerHTML = `
+      <div class="person">
+        <label>Número de Documento:</label>
+        <input type="text" name="personDocument">
+        <label>Nombre y Apellidos:</label>
+        <input type="text" name="personName">
+        <label>Fecha de Nacimiento:</label>
+        <input type="text" name="personBirthdate" placeholder="DD-MM-AAAA">
+        <button type="button" class="btn delete-person-btn" style="display: none;">Eliminar</button>
+      </div>
+    `;
+    tempPhotoData = '';
+    photoPreviewContainer.style.display = 'none';
+    videoContainer.style.display = 'none';
+    activateCameraButton.textContent = "Activar Cámara";
+  });
+
+  // Evento para el botón "Agregar Persona": añade un nuevo bloque de campos para una persona
+  addPersonButton.addEventListener('click', () => {
+    const personDiv = document.createElement('div');
+    personDiv.classList.add('person');
+    personDiv.innerHTML = `
+      <label>Número de Documento:</label>
+      <input type="text" name="personDocument">
+      <label>Nombre y Apellidos:</label>
+      <input type="text" name="personName">
+      <label>Fecha de Nacimiento:</label>
+      <input type="text" name="personBirthdate" placeholder="DD-MM-AAAA">
+      <button type="button" class="btn delete-person-btn">Eliminar</button>
+    `;
+    personsContainer.appendChild(personDiv);
+    updateDeleteButtons();
+  });
+
+  // Actualiza la visibilidad de los botones de eliminar en cada bloque de persona
+  function updateDeleteButtons() {
+    const personDivs = personsContainer.querySelectorAll('.person');
+    personDivs.forEach((div, index) => {
+      const delBtn = div.querySelector('.delete-person-btn');
+      // Si hay más de un bloque, muestra el botón; si es el único, lo oculta
+      if (personDivs.length > 1) {
+        delBtn.style.display = 'block';
+      } else {
+        delBtn.style.display = 'none';
+      }
+      // Agregar evento para eliminar este bloque
+      delBtn.onclick = () => {
+        div.remove();
+        updateDeleteButtons();
+      };
+    });
+  }
+
+  // Evento para guardar la nota (no se requieren todos los campos)
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     saveNote();
@@ -75,14 +129,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para guardar la nota en localStorage
   function saveNote() {
+    // Recopilar datos de cada persona
+    const personDivs = personsContainer.querySelectorAll('.person');
+    const persons = [];
+    personDivs.forEach(div => {
+      const documentNumber = div.querySelector('input[name="personDocument"]').value;
+      const name = div.querySelector('input[name="personName"]').value;
+      const birthdate = div.querySelector('input[name="personBirthdate"]').value;
+      persons.push({ documentNumber, name, birthdate });
+    });
+
     const noteData = {
-      documentNumber: document.getElementById('documentNumber').value,
-      fullName: document.getElementById('fullName').value,
-      birthdate: document.getElementById('birthdate').value,
-      parentsName: document.getElementById('parentsName').value,
-      address: document.getElementById('address').value,
-      phone: document.getElementById('phone').value,
-      facts: document.getElementById('facts').value,
+      facts: facts.value,
+      persons,
       photoUrl: tempPhotoData
     };
 
@@ -91,8 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 
-    // Reiniciar el formulario y limpiar la foto capturada
+    // Reiniciar formulario y áreas relacionadas
     noteForm.reset();
+    personsContainer.innerHTML = `
+      <div class="person">
+        <label>Número de Documento:</label>
+        <input type="text" name="personDocument">
+        <label>Nombre y Apellidos:</label>
+        <input type="text" name="personName">
+        <label>Fecha de Nacimiento:</label>
+        <input type="text" name="personBirthdate" placeholder="DD-MM-AAAA">
+        <button type="button" class="btn delete-person-btn" style="display: none;">Eliminar</button>
+      </div>
+    `;
     tempPhotoData = '';
     photoPreviewContainer.style.display = 'none';
     alert("Nota guardada exitosamente.");
@@ -105,19 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
       notesContainer.innerHTML = "<p>No hay notas guardadas.</p>";
       return;
     }
-    notesContainer.innerHTML = notes.map((note, index) => `
-      <div class="note">
-        <p><strong>Documento:</strong> ${note.documentNumber || 'N/A'}</p>
-        <p><strong>Nombre:</strong> ${note.fullName || 'N/A'}</p>
-        <p><strong>Fecha de nacimiento:</strong> ${note.birthdate || 'N/A'}</p>
-        <p><strong>Padres:</strong> ${note.parentsName || 'N/A'}</p>
-        <p><strong>Dirección:</strong> ${note.address || 'N/A'}</p>
-        <p><strong>Teléfono:</strong> ${note.phone || 'N/A'}</p>
-        <p><strong>Hechos:</strong> ${note.facts || 'N/A'}</p>
-        ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto de la nota">` : ''}
-        <button onclick="deleteNote(${index})">Eliminar</button>
-      </div>
-    `).join('');
+    notesContainer.innerHTML = notes.map((note, index) => {
+      let personsHTML = '';
+      if (note.persons && note.persons.length > 0) {
+        personsHTML = note.persons.map(person => `
+          <p>
+            <strong>Documento:</strong> ${person.documentNumber || 'N/A'}<br>
+            <strong>Nombre:</strong> ${person.name || 'N/A'}<br>
+            <strong>F. Nacimiento:</strong> ${person.birthdate || 'N/A'}
+          </p>
+        `).join('');
+      }
+      return `
+        <div class="note">
+          <p><strong>Exposición:</strong> ${note.facts || 'N/A'}</p>
+          ${personsHTML}
+          ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto de la nota">` : ''}
+          <button onclick="deleteNote(${index})">Eliminar</button>
+        </div>
+      `;
+    }).join('');
   }
 
   // Función global para eliminar una nota
