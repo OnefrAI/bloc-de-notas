@@ -11,39 +11,41 @@
     <h1>Bloc de Notas</h1>
     <form id="noteForm">
       <label for="documentNumber">Número de Documento:</label>
-      <input type="text" id="documentNumber" name="documentNumber" required>
+      <input type="text" id="documentNumber" name="documentNumber">
 
       <label for="fullName">Nombre y apellidos:</label>
-      <input type="text" id="fullName" name="fullName" required>
+      <input type="text" id="fullName" name="fullName">
 
       <label for="birthdate">Fecha de nacimiento:</label>
-      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}-\d{2}-\d{4}" placeholder="DD-MM-AAAA" required>
+      <input type="text" id="birthdate" name="birthdate" inputmode="numeric" pattern="\d{2}-\d{2}-\d{4}" placeholder="DD-MM-AAAA">
 
       <label for="parentsName">Nombre del padre y la madre:</label>
       <input type="text" id="parentsName" name="parentsName">
 
       <label for="address">Dirección del domicilio:</label>
-      <input type="text" id="address" name="address" required>
+      <input type="text" id="address" name="address">
 
       <label for="phone">Número de teléfono:</label>
-      <input type="tel" id="phone" name="phone" required>
+      <input type="tel" id="phone" name="phone">
 
       <label for="facts">Exposición de los hechos:</label>
-      <textarea id="facts" name="facts" rows="4" required></textarea>
+      <textarea id="facts" name="facts" rows="4"></textarea>
 
       <div class="button-container">
-        <button type="button" id="dictateButton" class="btn mic-btn">🎤 Dictar</button>
-        <button type="button" id="cameraButton" class="btn camera-btn">📸 Foto</button>
-        <button type="submit" class="btn save-btn">Guardar Nota</button>
+         <button type="button" id="createNoteButton" class="btn create-btn">Crear Nota</button>
+         <button type="submit" id="saveNoteButton" class="btn save-btn">Guardar Nota</button>
       </div>
       
-      <!-- Vista previa de la foto seleccionada -->
+      <!-- Contenedor para el video de la cámara (inicialmente oculto) -->
+      <div id="videoContainer" style="display: none;">
+        <video id="video" autoplay></video>
+      </div>
+      
+      <!-- Vista previa de la foto capturada (inicialmente oculta) -->
       <div id="photoPreviewContainer" style="display: none;">
-        <img id="photoPreview" src="" alt="Foto seleccionada">
+        <img id="photoPreview" src="" alt="Foto capturada">
       </div>
     </form>
-
-    <button type="button" id="newNoteButton" class="btn add-btn">+ Crear Nueva Nota</button>
 
     <div id="notesContainer"></div>
   </div>
