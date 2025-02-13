@@ -136,23 +136,3 @@ input, textarea {
 .note button:hover {
   background-color: #c82333;
 }
-
-@media (max-width: 480px) {
-  .container {
-    padding: 15px;
-  }
-
-  .button-container {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
-
-  .btn:last-child {
-    margin-bottom: 0;
-  }
-}
