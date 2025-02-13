@@ -1,36 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Elementos de los campos principales
   const noteForm = document.getElementById('noteForm');
-  const documentNumber = document.getElementById('documentNumber');
-  const fullName = document.getElementById('fullName');
-  const birthdate = document.getElementById('birthdate');
-  const parentsName = document.getElementById('parentsName');
-  const address = document.getElementById('address');
-  const phone = document.getElementById('phone');
-  const facts = document.getElementById('facts');
-  
-  // Contenedor de identificados
-  const identificationsContainer = document.getElementById('identificationsContainer');
-  const addIdentificationButton = document.getElementById('addIdentificationButton');
-  
-  // Botones de acción
-  const newNoteButton = document.getElementById('newNoteButton');
-  const activateCameraButton = document.getElementById('activateCameraButton');
-  const saveNoteButton = document.getElementById('saveNoteButton');
-  
-  // Elementos de cámara y foto
+  const notesContainer = document.getElementById('notesContainer');
+  const createNoteButton = document.getElementById('createNoteButton');
   const videoContainer = document.getElementById('videoContainer');
   const video = document.getElementById('video');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
   const photoPreview = document.getElementById('photoPreview');
-  
-  // Contenedor de notas
-  const notesContainer = document.getElementById('notesContainer');
-  
+
   let cameraStream = null;
   let tempPhotoData = '';
-  
-  // Función para iniciar la cámara
+
+  // Función para iniciar la cámara y mostrar el video en vivo
   function startCamera() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => {
@@ -38,15 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
         video.srcObject = stream;
         video.play();
         videoContainer.style.display = 'block';
-        activateCameraButton.textContent = "Capturar Foto";
+        createNoteButton.textContent = "Capturar Foto";
       })
       .catch(err => {
         console.error("Error al acceder a la cámara:", err);
-        alert("No se pudo acceder a la cámara. Asegúrate de otorgar permisos.");
+        alert("No se pudo acceder a la cámara. Asegúrate de haber otorgado permisos.");
       });
   }
-  
-  // Función para capturar la foto
+
+  // Función para capturar una foto del video
   function capturePhoto() {
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
@@ -57,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     photoPreview.src = tempPhotoData;
     photoPreviewContainer.style.display = 'block';
   }
-  
+
   // Función para detener la cámara
   function stopCamera() {
     if (cameraStream) {
@@ -65,123 +45,59 @@ document.addEventListener('DOMContentLoaded', () => {
       cameraStream = null;
     }
     videoContainer.style.display = 'none';
-    activateCameraButton.textContent = "Activar Cámara";
+    createNoteButton.textContent = "Crear Nota";
   }
-  
-  // Evento para el botón "Activar Cámara"
-  activateCameraButton.addEventListener('click', () => {
+
+  // Evento para el botón "Crear Nota"
+  // Si la cámara no está activa, se inicia para tomar foto; si está activa, se captura la imagen.
+  createNoteButton.addEventListener('click', () => {
     if (!cameraStream) {
+      // Si ya hay una foto capturada, preguntar si se desea retomar otra.
+      if (tempPhotoData) {
+        if (!confirm("Ya se ha capturado una foto. ¿Deseas tomar otra?")) {
+          return;
+        }
+        tempPhotoData = '';
+        photoPreviewContainer.style.display = 'none';
+      }
       startCamera();
     } else {
       capturePhoto();
       stopCamera();
     }
   });
-  
-  // Evento para "Nueva Nota": reinicia el formulario y los contenedores
-  newNoteButton.addEventListener('click', () => {
-    noteForm.reset();
-    identificationsContainer.innerHTML = `
-      <div class="identification">
-        <label>Número de Documento:</label>
-        <input type="text" name="idDocument">
-        <label>Nombre y Apellidos:</label>
-        <input type="text" name="idName">
-        <label>Fecha de Nacimiento:</label>
-        <input type="text" name="idBirthdate" placeholder="DD-MM-AAAA">
-        <button type="button" class="btn delete-identification-btn" style="display: none;">Eliminar</button>
-      </div>
-    `;
-    tempPhotoData = '';
-    photoPreviewContainer.style.display = 'none';
-    videoContainer.style.display = 'none';
-    activateCameraButton.textContent = "Activar Cámara";
-  });
-  
-  // Evento para agregar un nuevo identificado
-  addIdentificationButton.addEventListener('click', () => {
-    const identificationDiv = document.createElement('div');
-    identificationDiv.classList.add('identification');
-    identificationDiv.innerHTML = `
-      <label>Número de Documento:</label>
-      <input type="text" name="idDocument">
-      <label>Nombre y Apellidos:</label>
-      <input type="text" name="idName">
-      <label>Fecha de Nacimiento:</label>
-      <input type="text" name="idBirthdate" placeholder="DD-MM-AAAA">
-      <button type="button" class="btn delete-identification-btn">Eliminar</button>
-    `;
-    identificationsContainer.appendChild(identificationDiv);
-    updateDeleteButtons();
-  });
-  
-  // Actualiza la visibilidad y funcionalidad de los botones "Eliminar" en cada identificado
-  function updateDeleteButtons() {
-    const identificationDivs = identificationsContainer.querySelectorAll('.identification');
-    identificationDivs.forEach(div => {
-      const delBtn = div.querySelector('.delete-identification-btn');
-      if (identificationDivs.length > 1) {
-        delBtn.style.display = 'block';
-      } else {
-        delBtn.style.display = 'none';
-      }
-      delBtn.onclick = () => {
-        div.remove();
-        updateDeleteButtons();
-      };
-    });
-  }
-  
-  // Guardar la nota (los campos no son obligatorios)
+
+  // Evento para guardar la nota (se puede guardar sin que todos los campos estén rellenos)
   noteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     saveNote();
   });
-  
+
+  // Función para guardar la nota en localStorage
   function saveNote() {
     const noteData = {
-      documentNumber: documentNumber.value,
-      fullName: fullName.value,
-      birthdate: birthdate.value,
-      parentsName: parentsName.value,
-      address: address.value,
-      phone: phone.value,
-      facts: facts.value,
-      identifications: [],
+      documentNumber: document.getElementById('documentNumber').value,
+      fullName: document.getElementById('fullName').value,
+      birthdate: document.getElementById('birthdate').value,
+      parentsName: document.getElementById('parentsName').value,
+      address: document.getElementById('address').value,
+      phone: document.getElementById('phone').value,
+      facts: document.getElementById('facts').value,
       photoUrl: tempPhotoData
     };
-    
-    const identificationDivs = identificationsContainer.querySelectorAll('.identification');
-    identificationDivs.forEach(div => {
-      const idDocument = div.querySelector('input[name="idDocument"]').value;
-      const idName = div.querySelector('input[name="idName"]').value;
-      const idBirthdate = div.querySelector('input[name="idBirthdate"]').value;
-      noteData.identifications.push({ idDocument, idName, idBirthdate });
-    });
-    
+
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
     notes.push(noteData);
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
-    
-    // Reiniciar formulario y áreas relacionadas
+
+    // Reiniciar el formulario y limpiar la foto capturada
     noteForm.reset();
-    identificationsContainer.innerHTML = `
-      <div class="identification">
-        <label>Número de Documento:</label>
-        <input type="text" name="idDocument">
-        <label>Nombre y Apellidos:</label>
-        <input type="text" name="idName">
-        <label>Fecha de Nacimiento:</label>
-        <input type="text" name="idBirthdate" placeholder="DD-MM-AAAA">
-        <button type="button" class="btn delete-identification-btn" style="display: none;">Eliminar</button>
-      </div>
-    `;
     tempPhotoData = '';
     photoPreviewContainer.style.display = 'none';
     alert("Nota guardada exitosamente.");
   }
-  
+
   // Función para mostrar las notas guardadas
   function displayNotes() {
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -189,47 +105,33 @@ document.addEventListener('DOMContentLoaded', () => {
       notesContainer.innerHTML = "<p>No hay notas guardadas.</p>";
       return;
     }
-    notesContainer.innerHTML = notes.map((note, index) => {
-      let identificationsHTML = '';
-      if (note.identifications && note.identifications.length > 0) {
-        identificationsHTML = note.identifications.map(ident => `
-          <p>
-            <strong>Documento:</strong> ${ident.idDocument || 'N/A'}<br>
-            <strong>Nombre:</strong> ${ident.idName || 'N/A'}<br>
-            <strong>Fecha de Nacimiento:</strong> ${ident.idBirthdate || 'N/A'}
-          </p>
-        `).join('');
-      }
-      return `
-        <div class="note">
-          <p><strong>Datos Principales:</strong></p>
-          <p>
-            <strong>Número de Documento:</strong> ${note.documentNumber || 'N/A'}<br>
-            <strong>Nombre y Apellidos:</strong> ${note.fullName || 'N/A'}<br>
-            <strong>Fecha de Nacimiento:</strong> ${note.birthdate || 'N/A'}<br>
-            <strong>Nombre del padre y la madre:</strong> ${note.parentsName || 'N/A'}<br>
-            <strong>Dirección del Domicilio:</strong> ${note.address || 'N/A'}<br>
-            <strong>Número de Teléfono:</strong> ${note.phone || 'N/A'}<br>
-            <strong>Exposición de los Hechos:</strong> ${note.facts || 'N/A'}
-          </p>
-          <p><strong>Identificados:</strong></p>
-          ${identificationsHTML}
-          ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto de la nota">` : ''}
-          <button onclick="deleteNote(${index})">Eliminar</button>
-        </div>
-      `;
-    }).join('');
+    notesContainer.innerHTML = notes.map((note, index) => `
+      <div class="note">
+        <p><strong>Documento:</strong> ${note.documentNumber || 'N/A'}</p>
+        <p><strong>Nombre:</strong> ${note.fullName || 'N/A'}</p>
+        <p><strong>Fecha de nacimiento:</strong> ${note.birthdate || 'N/A'}</p>
+        <p><strong>Padres:</strong> ${note.parentsName || 'N/A'}</p>
+        <p><strong>Dirección:</strong> ${note.address || 'N/A'}</p>
+        <p><strong>Teléfono:</strong> ${note.phone || 'N/A'}</p>
+        <p><strong>Hechos:</strong> ${note.facts || 'N/A'}</p>
+        ${note.photoUrl ? `<img src="${note.photoUrl}" alt="Foto de la nota">` : ''}
+        <button onclick="deleteNote(${index})">Eliminar</button>
+      </div>
+    `).join('');
   }
-  
+
+  // Función global para eliminar una nota
   window.deleteNote = function(index) {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    if (index >= 0 && index < notes.length && confirm("¿Estás seguro de eliminar esta nota?")) {
-      notes.splice(index, 1);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      displayNotes();
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+    if (index >= 0 && index < notes.length) {
+      if (confirm("¿Estás seguro de eliminar esta nota?")) {
+        notes.splice(index, 1);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        displayNotes();
+      }
     }
-  }
-  
+  };
+
   // Mostrar notas al cargar la página
   displayNotes();
 });
